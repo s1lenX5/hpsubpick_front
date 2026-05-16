@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HPSubPick – Component Identification System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: linear-gradient(135deg, #0F172B 0%, #1D293D 50%, #0F172B 100%);
+      --header-bg: rgba(15, 23, 43, 0.90);
+      --card-bg: rgba(29, 41, 61, 0.50);
+      --card-bg-light: rgba(29, 41, 61, 0.40);
+      --card-bg-dark: rgba(15, 23, 43, 0.50);
+      --card-border: rgba(49, 65, 88, 0.50);
+      --card-border-subtle: rgba(49, 65, 88, 0.30);
+      --cyan: #00D3F3;
+      --cyan-light: #53EAFD;
+      --cyan-grad: linear-gradient(135deg, #00B8DB 0%, #0092B8 100%);
+      --cyan-grad-h: linear-gradient(90deg, #00B8DB 0%, #0092B8 100%);
+      --logo-shadow: 0 10px 15px -3px rgba(0, 184, 219, 0.30), 0 4px 6px -4px rgba(0, 184, 219, 0.30);
+      --text-white: #FFFFFF;
+      --text-secondary: #CAD5E2;
+      --text-muted: #90A1B9;
+      --text-icon: #62748E;
+      --green: #05DF72;
+      --green-light: #7BF1A8;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, Roboto, Helvetica, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--text-white);
+      overflow-x: hidden;
+    }
+
+    /* ── Screen management ── */
+    .screen { display: none; flex-direction: column; min-height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* ────────────────────────────────
+       SPLASH SCREEN
+    ──────────────────────────────── */
+    .splash-screen {
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .splash-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .splash-logo {
+      display: flex;
+      width: 52px;
+      height: 52px;
+      padding: 12px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--cyan-grad);
+      box-shadow: var(--logo-shadow);
+      margin-bottom: 32px;
+    }
+
+    .splash-title {
+      font-size: 36px;
+      font-weight: 500;
+      line-height: 40px;
+      text-align: center;
+      color: var(--text-white);
+      margin-bottom: 8px;
+    }
+
+    .splash-subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 28px;
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .loading-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      animation: dot-bounce 1.4s ease-in-out infinite;
+    }
+    .loading-dot:nth-child(1) { animation-delay: 0s; }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; }
+      40% { transform: scale(1.15); opacity: 1; }
+    }
+
+    /* ────────────────────────────────
+       SHARED HEADER (all panel screens)
+    ──────────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 64px;
+      border-bottom: 1px solid var(--card-border);
+      background: var(--header-bg);
+      flex-shrink: 0;
+    }
+
+    .header-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      border-radius: 10px;
+      background: var(--cyan-grad);
+      box-shadow: var(--logo-shadow);
+      flex-shrink: 0;
+    }
+
+    .header-brand-name {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 28px;
+      color: var(--text-white);
+    }
+
+    .header-brand-sub {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      color: var(--text-secondary);
+    }
+
+    /* ────────────────────────────────
+       MAIN PAGE
+    ──────────────────────────────── */
+    .main-page-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 24px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(15, 23, 43, 0.80);
+      flex-shrink: 0;
+    }
+
+    .main-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      padding: 12px;
+      border-radius: 16px;
+      background: var(--cyan-grad);
+      box-shadow: var(--logo-shadow);
+      flex-shrink: 0;
+    }
+
+    .main-brand-name {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 36px;
+      color: var(--text-white);
+    }
+
+    .main-brand-sub {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      color: var(--text-muted);
+    }
+
+    .main-content-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .main-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
+      width: 100%;
+      max-width: 448px;
+    }
+
+    .scan-hero-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scan-icon-box {
+      display: flex;
+      width: 113px;
+      height: 113px;
+      padding: 24px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 184, 219, 0.30);
+      background: rgba(0, 184, 219, 0.10);
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 40px;
+      text-align: center;
+      color: var(--text-white);
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 28px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .primary-upload-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 32px;
+      border-radius: 16px;
+      border: 2px solid rgba(0, 211, 243, 0.30);
+      background: var(--cyan-grad-h);
+      box-shadow: 0 25px 50px -12px rgba(0, 184, 219, 0.50);
+      color: var(--text-white);
+      font-family: inherit;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .primary-upload-btn:hover { opacity: 0.92; transform: translateY(-2px); }
+    .primary-upload-btn:active { transform: translateY(0); }
+
+    .feature-strip {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .feature-tile {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 17px;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+    }
+
+    .feature-stat {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+      color: var(--cyan);
+      text-align: center;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 16px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ────────────────────────────────
+       SPLIT PANEL LAYOUT (Select / Processing / Results)
+    ──────────────────────────────── */
+    .split-layout {
+      flex: 1;
+      display: flex;
+      gap: 32px;
+      padding: 32px 64px;
+      min-height: 0;
+    }
+
+    .left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      min-width: 0;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    /* Right panel: empty state */
+    .right-panel-empty {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg-light);
+    }
+
+    /* Right panel: results */
+    .right-panel-results {
+      gap: 20px;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .panel-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .panel-heading {
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 28px;
+      color: var(--text-white);
+    }
+
+    .icon-close-btn {
+      display: flex;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .icon-close-btn:hover { background: rgba(49, 65, 88, 0.30); }
+
+    /* Image viewer pane */
+    .image-pane {
+      flex: 1;
+      position: relative;
+      border-radius: 14px;
+      border: 1px solid var(--card-border-subtle);
+      background: var(--card-bg-dark);
+      overflow: hidden;
+      min-height: 200px;
+    }
+
+    .pane-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .pane-image-contain {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Upload another button */
+    .secondary-upload-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 2px solid rgba(0, 184, 219, 0.40);
+      background: rgba(0, 184, 219, 0.15);
+      color: var(--cyan-light);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 24px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .secondary-upload-btn:hover { background: rgba(0, 184, 219, 0.25); }
+
+    /* ── No Part Selected state ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px;
+    }
+
+    .empty-icon-ring {
+      display: flex;
+      width: 112px;
+      height: 112px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(49, 65, 88, 0.30);
+    }
+
+    .empty-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .empty-body {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 26px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 260px;
+    }
+
+    /* ── Bounding box overlays (Select Component) ── */
+    .bbox-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .part-bbox {
+      position: absolute;
+      border-radius: 10px;
+      border: 2.5px solid var(--cyan);
+      background: transparent;
+      box-shadow: 0 10px 15px -3px rgba(0, 184, 219, 0.50), 0 4px 6px -4px rgba(0, 184, 219, 0.50);
+      cursor: pointer;
+      pointer-events: all;
+      transition: background 0.15s;
+    }
+    .part-bbox:hover { background: rgba(0, 184, 219, 0.12); }
+    .part-bbox:active { background: rgba(0, 184, 219, 0.22); }
+
+    /* ── Processing spinner ── */
+    .processing-image {
+      filter: blur(2px);
+    }
+
+    .processing-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner-box {
+      width: 116px;
+      height: 116px;
+      border-radius: 16px;
+      border: 2px solid var(--cyan);
+      background: rgba(0, 184, 219, 0.20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: spin-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes spin-glow {
+      0% { transform: rotate(0deg); box-shadow: 0 0 0 0 rgba(0, 211, 243, 0.2); }
+      50% { transform: rotate(180deg); box-shadow: 0 0 20px 4px rgba(0, 211, 243, 0.3); }
+      100% { transform: rotate(360deg); box-shadow: 0 0 0 0 rgba(0, 211, 243, 0.2); }
+    }
+
+    /* ── Selected part image frame ── */
+    .selected-part-frame {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .selected-part-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .selected-part-img {
+      max-width: 240px;
+      max-height: 240px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .selected-part-border {
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      border: 2.5px solid var(--cyan);
+      box-shadow: 0 4px 6px -4px rgba(0, 184, 219, 0.50);
+      pointer-events: none;
+    }
+
+    /* ── Results right panel ── */
+    .match-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      align-self: center;
+      padding: 0 28px;
+      height: 56px;
+      border-radius: 9999px;
+      border: 2px solid rgba(0, 201, 80, 0.50);
+      background: rgba(0, 201, 80, 0.20);
+    }
+
+    .match-badge-label {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 24px;
+      color: var(--green-light);
+    }
+
+    .part-number-card {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 30px;
+      border-radius: 16px;
+      border: 2px solid rgba(0, 184, 219, 0.60);
+      background: linear-gradient(135deg, rgba(0, 184, 219, 0.20) 0%, rgba(0, 146, 184, 0.20) 100%);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
+    }
+
+    .part-number-icon-box {
+      display: flex;
+      width: 88px;
+      height: 88px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: rgba(0, 184, 219, 0.30);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.10);
+      flex-shrink: 0;
+    }
+
+    .part-number-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .part-tag {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 16px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--cyan-light);
+    }
+
+    .part-number-value {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 30px;
+      font-weight: 400;
+      line-height: 37.5px;
+      letter-spacing: -0.75px;
+      color: var(--text-white);
+    }
+
+    .part-name-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
+    }
+
+    .part-name-tag {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 16px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .part-name-value {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 30px;
+      color: var(--text-white);
+    }
+
+    .part-name-desc {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 26px;
+      color: var(--text-secondary);
+    }
+
+    /* ────────────────────────────────
+       RESPONSIVE
+    ──────────────────────────────── */
+    @media (max-width: 1024px) {
+      .page-header { padding: 16px 32px; }
+      .split-layout { padding: 24px 32px; gap: 24px; }
+    }
+
+    @media (max-width: 768px) {
+      .page-header { padding: 12px 20px; }
+      .split-layout {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+        overflow-y: auto;
+      }
+      .right-panel { min-height: 300px; }
+      .primary-upload-btn { font-size: 18px; padding: 20px 24px; }
+      .hero-title { font-size: 28px; }
+      .hero-subtitle { font-size: 16px; }
+      .feature-strip { flex-wrap: wrap; }
+      .feature-tile { min-width: calc(50% - 6px); }
+      .main-brand-name { font-size: 22px; }
+      .part-number-value { font-size: 22px; }
+      .part-name-value { font-size: 20px; }
+    }
+
+    @media (max-width: 480px) {
+      .splash-title { font-size: 28px; }
+      .splash-subtitle { font-size: 16px; }
+      .left-panel { padding: 16px; }
+      .right-panel-results { padding: 16px; }
+      .part-number-card { flex-direction: column; align-items: flex-start; }
+      .part-number-icon-box { width: 64px; height: 64px; }
+      .feature-tile { min-width: 100%; }
+      .scan-icon-box { width: 88px; height: 88px; }
+    }
+
+    /* Hidden file input */
+    #file-input { display: none; }
+  </style>
+</head>
+<body>
+
+<input type="file" id="file-input" accept="image/*">
+
+<!-- ══════════════════════════════════════
+     SPLASH SCREEN
+══════════════════════════════════════ -->
+<div class="screen splash-screen active" id="screen-splash">
+  <div class="splash-inner">
+    <div class="splash-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M16.9163 4.66669H11.083L8.16634 8.16669H4.66634C4.0475 8.16669 3.45401 8.41252 3.01643 8.8501C2.57884 9.28769 2.33301 9.88118 2.33301 10.5V21C2.33301 21.6189 2.57884 22.2124 3.01643 22.6499C3.45401 23.0875 4.0475 23.3334 4.66634 23.3334H23.333C23.9518 23.3334 24.5453 23.0875 24.9829 22.6499C25.4205 22.2124 25.6663 21.6189 25.6663 21V10.5C25.6663 9.88118 25.4205 9.28769 24.9829 8.8501C24.5453 8.41252 23.9518 8.16669 23.333 8.16669H19.833L16.9163 4.66669Z" stroke="white" stroke-width="2.91667" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 18.6667C15.933 18.6667 17.5 17.0997 17.5 15.1667C17.5 13.2337 15.933 11.6667 14 11.6667C12.067 11.6667 10.5 13.2337 10.5 15.1667C10.5 17.0997 12.067 18.6667 14 18.6667Z" stroke="white" stroke-width="2.91667" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="splash-title">HPSubPick</h1>
+    <p class="splash-subtitle">Component Identification System</p>
+    <div class="loading-dots">
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+      <div class="loading-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN PAGE
+══════════════════════════════════════ -->
+<div class="screen" id="screen-main">
+  <header class="main-page-header">
+    <div class="main-logo-wrap">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M19.3337 5.33337H12.667L9.33366 9.33337H5.33366C4.62641 9.33337 3.94814 9.61433 3.44804 10.1144C2.94794 10.6145 2.66699 11.2928 2.66699 12V24C2.66699 24.7073 2.94794 25.3856 3.44804 25.8857C3.94814 26.3858 4.62641 26.6667 5.33366 26.6667H26.667C27.3742 26.6667 28.0525 26.3858 28.5526 25.8857C29.0527 25.3856 29.3337 24.7073 29.3337 24V12C29.3337 11.2928 29.0527 10.6145 28.5526 10.1144C28.0525 9.61433 27.3742 9.33337 26.667 9.33337H22.667L19.3337 5.33337Z" stroke="white" stroke-width="3.33333" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M16 21.3333C18.2091 21.3333 20 19.5425 20 17.3333C20 15.1242 18.2091 13.3333 16 13.3333C13.7909 13.3333 12 15.1242 12 17.3333C12 19.5425 13.7909 21.3333 16 21.3333Z" stroke="white" stroke-width="3.33333" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="main-brand-name">HPSubPick</div>
+      <div class="main-brand-sub">Component Scanner</div>
+    </div>
+  </header>
+
+  <main class="main-content-area">
+    <div class="main-hero">
+      <div class="scan-hero-group">
+        <div class="scan-icon-box">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <path d="M8 18.6667V13.3333C8 11.9188 8.5619 10.5623 9.5621 9.5621C10.5623 8.5619 11.9188 8 13.3333 8H18.6667" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45.333 8H50.6663C52.0808 8 53.4374 8.5619 54.4376 9.5621C55.4378 10.5623 55.9997 11.9188 55.9997 13.3333V18.6667" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M55.9997 45.3333V50.6666C55.9997 52.0811 55.4378 53.4377 54.4376 54.4379C53.4374 55.4381 52.0808 56 50.6663 56H45.333" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.6667 56H13.3333C11.9188 56 10.5623 55.4381 9.5621 54.4379C8.5619 53.4377 8 52.0811 8 50.6666V45.3333" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.667 32H45.3337" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="hero-title">Ready to Scan</h2>
+        <p class="hero-subtitle">Identify printer parts instantly</p>
+      </div>
+
+      <button class="primary-upload-btn" onclick="triggerUpload()">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <path d="M26.25 18.75V23.75C26.25 24.413 25.9866 25.0489 25.5178 25.5178C25.0489 25.9866 24.413 26.25 23.75 26.25H6.25C5.58696 26.25 4.95107 25.9866 4.48223 25.5178C4.01339 25.0489 3.75 24.413 3.75 23.75V18.75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21.25 10L15 3.75L8.75 10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15 3.75V18.75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Upload Image
+      </button>
+
+      <div class="feature-strip">
+        <div class="feature-tile">
+          <span class="feature-stat">Fast</span>
+          <span class="feature-desc">Detection</span>
+        </div>
+        <div class="feature-tile">
+          <span class="feature-stat">Smart</span>
+          <span class="feature-desc">AI Powered</span>
+        </div>
+        <div class="feature-tile">
+          <span class="feature-stat">30+</span>
+          <span class="feature-desc">Parts</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════
+     SELECT COMPONENT SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-select">
+  <header class="page-header">
+    <div class="header-logo-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M14.5 4H9.5L7 7H4C3.46957 7 2.96086 7.21071 2.58579 7.58579C2.21071 7.96086 2 8.46957 2 9V18C2 18.5304 2.21071 19.0391 2.58579 19.4142C2.96086 19.7893 3.46957 20 4 20H20C20.5304 20 21.0391 19.7893 21.4142 19.4142C21.7893 19.0391 22 18.5304 22 18V9C22 8.46957 21.7893 7.96086 21.4142 7.58579C21.0391 7.21071 20.5304 7 20 7H17L14.5 4Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-brand-name">HPSubPick</div>
+      <div class="header-brand-sub">Component Identification System</div>
+    </div>
+  </header>
+
+  <div class="split-layout">
+    <!-- Left: image + bounding boxes -->
+    <div class="left-panel">
+      <div class="panel-top-bar">
+        <h2 class="panel-heading">Select Component</h2>
+        <button class="icon-close-btn" onclick="showScreen('main')" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18" stroke="#90A1B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="#90A1B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="image-pane">
+        <img class="pane-image" id="select-image"
+          src="https://api.builder.io/api/v1/image/assets/TEMP/99aa63fc9895c08b2b3825550c9215d020466b27?width=1019"
+          alt="Uploaded printer parts">
+        <div class="bbox-layer">
+          <!-- Fuser Assembly (large left component) -->
+          <div class="part-bbox" style="left:1.8%;top:17.8%;width:38.5%;height:51.8%"
+            onclick="selectPart(0)" title="Click to identify this part"></div>
+          <!-- Top dark component -->
+          <div class="part-bbox" style="left:42%;top:0%;width:28%;height:35%"
+            onclick="selectPart(1)" title="Click to identify this part"></div>
+          <!-- HP Start guide (blue bag) -->
+          <div class="part-bbox" style="left:42%;top:34%;width:28%;height:36%"
+            onclick="selectPart(2)" title="Click to identify this part"></div>
+          <!-- Bottom flat component -->
+          <div class="part-bbox" style="left:6.3%;top:72%;width:60.7%;height:24%"
+            onclick="selectPart(3)" title="Click to identify this part"></div>
+          <!-- Power cable (right) -->
+          <div class="part-bbox" style="left:72.1%;top:54.2%;width:17.3%;height:43%"
+            onclick="selectPart(4)" title="Click to identify this part"></div>
+        </div>
+      </div>
+
+      <button class="secondary-upload-btn" onclick="triggerUpload()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M17.5 12.5V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V12.5" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14.1663 6.66667L9.99967 2.5L5.83301 6.66667" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 2.5V12.5" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Upload Another Image
+      </button>
+    </div>
+
+    <!-- Right: No Part Selected -->
+    <div class="right-panel right-panel-empty">
+      <div class="empty-state">
+        <div class="empty-icon-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <path d="M8 18.6667V13.3333C8 11.9188 8.5619 10.5623 9.5621 9.5621C10.5623 8.5619 11.9188 8 13.3333 8H18.6667" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45.3335 8H50.6668C52.0813 8 53.4379 8.5619 54.4381 9.5621C55.4383 10.5623 56.0002 11.9188 56.0002 13.3333V18.6667" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M56.0002 45.3333V50.6667C56.0002 52.0811 55.4383 53.4377 54.4381 54.4379C53.4379 55.4381 52.0813 56 50.6668 56H45.3335" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.6667 56H13.3333C11.9188 56 10.5623 55.4381 9.5621 54.4379C8.5619 53.4377 8 52.0811 8 50.6667V45.3333" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.6665 32H45.3332" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">No Part Selected</h3>
+        <p class="empty-body">Click on the printer part among the highlighted areas to identify it</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PROCESSING SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="screen-processing">
+  <header class="page-header">
+    <div class="header-logo-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M14.5 4H9.5L7 7H4C3.46957 7 2.96086 7.21071 2.58579 7.58579C2.21071 7.96086 2 8.46957 2 9V18C2 18.5304 2.21071 19.0391 2.58579 19.4142C2.96086 19.7893 3.46957 20 4 20H20C20.5304 20 21.0391 19.7893 21.4142 19.4142C21.7893 19.0391 22 18.5304 22 18V9C22 8.46957 21.7893 7.96086 21.4142 7.58579C21.0391 7.21071 20.5304 7 20 7H17L14.5 4Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-brand-name">HPSubPick</div>
+      <div class="header-brand-sub">Component Identification System</div>
+    </div>
+  </header>
+
+  <div class="split-layout">
+    <!-- Left: Processing animation -->
+    <div class="left-panel">
+      <div class="panel-top-bar">
+        <h2 class="panel-heading">Processing Image...</h2>
+        <button class="icon-close-btn" onclick="showScreen('select')" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18" stroke="#90A1B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="#90A1B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="image-pane">
+        <img class="pane-image processing-image" id="processing-image"
+          src="https://api.builder.io/api/v1/image/assets/TEMP/99aa63fc9895c08b2b3825550c9215d020466b27?width=1019"
+          alt="Processing">
+        <div class="processing-overlay">
+          <div class="spinner-box">
+            <svg width="64" height="64" viewBox="0 0 70 78" fill="none">
+              <g clip-path="url(#clip_proc)">
+                <path d="M44.7543 58.5585L42.423 63.3554C41.8047 64.6276 40.8445 65.6692 39.7537 66.2511C38.6629 66.833 37.5308 66.9076 36.6064 66.4583L33.1212 64.7645" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15.6952 56.2952L12.2099 54.6013C11.2856 54.1521 10.6447 53.2159 10.4283 51.9986C10.2119 50.7814 10.4377 49.3828 11.056 48.1107L13.3873 43.3138" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M25.044 19.3297L27.3753 14.5328C27.9936 13.2606 28.9538 12.219 30.0446 11.6371C31.1354 11.0552 32.2675 10.9806 33.1919 11.4299L36.6771 13.1237" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M54.1031 21.593L57.5883 23.2869C58.5127 23.7361 59.1536 24.6723 59.37 25.8896C59.5864 27.1068 59.3606 28.5053 58.7423 29.7775L56.411 34.5744" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M43.6122 43.1787L26.1859 34.7095" stroke="#00D3F2" stroke-width="5.33333" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <defs>
+                <clipPath id="clip_proc">
+                  <rect width="46.5009" height="64" fill="white" transform="translate(41.8231 77.8882) rotate(-154.08)"/>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <button class="secondary-upload-btn" onclick="triggerUpload()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M17.5 12.5V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V12.5" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14.1663 6.66667L9.99967 2.5L5.83301 6.66667" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 2.5V12.5" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Upload Another Image
+      </button>
+    </div>
+
+    <!-- Right: No Part Yet -->
+    <div class="right-panel right-panel-empty">
+      <div class="empty-state">
+        <div class="empty-icon-ring">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <path d="M8 18.6667V13.3333C8 11.9188 8.5619 10.5623 9.5621 9.5621C10.5623 8.5619 11.9188 8 13.3333 8H18.6667" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M45.3335 8H50.6668C52.0813 8 53.4379 8.5619 54.4381 9.5621C55.4383 10.5623 56.0002 11.9188 56.0002 13.3333V18.6667" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M56.0002 45.3333V50.6667C56.0002 52.0811 55.4383 53.4377 54.4381 54.4379C53.4379 55.4381 52.0813 56 50.6668 56H45.3335" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.6667 56H13.3333C11.9188 56 10.5623 55.4381 9.5621 54.4379C8.5619 53.4377 8 52.0811 8 50.6667V45.3333" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18.6665 32H45.3332" stroke="#62748E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">No Part Selected</h3>
+        <p class="empty-body">Click on the printer part among the highlighted areas to identify it</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     RESULTS SCREEN (Diagnostic Terminal)
+══════════════════════════════════════ -->
+<div class="screen" id="screen-results">
+  <header class="page-header">
+    <div class="header-logo-wrap">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M14.5 4H9.5L7 7H4C3.46957 7 2.96086 7.21071 2.58579 7.58579C2.21071 7.96086 2 8.46957 2 9V18C2 18.5304 2.21071 19.0391 2.58579 19.4142C2.96086 19.7893 3.46957 20 4 20H20C20.5304 20 21.0391 19.7893 21.4142 19.4142C21.7893 19.0391 22 18.5304 22 18V9C22 8.46957 21.7893 7.96086 21.4142 7.58579C21.0391 7.21071 20.5304 7 20 7H17L14.5 4Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-brand-name">HPSubPick</div>
+      <div class="header-brand-sub">Component Identification System</div>
+    </div>
+  </header>
+
+  <div class="split-layout">
+    <!-- Left: Selected Part -->
+    <div class="left-panel">
+      <div class="panel-top-bar">
+        <h2 class="panel-heading">Selected Part</h2>
+        <button class="icon-close-btn" onclick="showScreen('main')" aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18" stroke="#90A1B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="#90A1B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="image-pane selected-part-frame">
+        <div class="selected-part-wrap">
+          <img class="selected-part-img"
+            src="https://api.builder.io/api/v1/image/assets/TEMP/0a21a70714f60b71df56878d84108ab44c65eba6?width=378"
+            alt="Fuser Assembly – selected part">
+          <div class="selected-part-border"></div>
+        </div>
+      </div>
+
+      <button class="secondary-upload-btn" onclick="triggerUpload()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M17.5 12.5V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V12.5" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M14.1663 6.66667L9.99967 2.5L5.83301 6.66667" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 2.5V12.5" stroke="#53EAFD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Upload Another Image
+      </button>
+    </div>
+
+    <!-- Right: Match Results -->
+    <div class="right-panel right-panel-results">
+      <div class="match-badge">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#05DF72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9 12L11 14L15 10" stroke="#05DF72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="match-badge-label">Match Found</span>
+      </div>
+
+      <div class="part-number-card">
+        <div class="part-number-icon-box">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <path d="M9.33301 21H46.6663" stroke="#53EAFD" stroke-width="5.83333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9.33301 35H46.6663" stroke="#53EAFD" stroke-width="5.83333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M23.3337 7L18.667 49" stroke="#53EAFD" stroke-width="5.83333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M37.3337 7L32.667 49" stroke="#53EAFD" stroke-width="5.83333" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="part-number-meta">
+          <span class="part-tag">Part Number</span>
+          <span class="part-number-value">RM2-6308-000CN</span>
+        </div>
+      </div>
+
+      <div class="part-name-card">
+        <span class="part-name-tag">Part Name</span>
+        <h3 class="part-name-value">Fuser Assembly HP M604/M605/M606</h3>
+        <p class="part-name-desc">The fuser assembly applies heat and pressure to permanently fuse toner to paper.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.getElementById('file-input');
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+  }
+
+  function triggerUpload() {
+    fileInput.click();
+  }
+
+  // Splash → Main after 2s
+  setTimeout(() => showScreen('main'), 2000);
+
+  // File selected → show Select Component screen
+  fileInput.addEventListener('change', function (e) {
+    if (!e.target.files || !e.target.files[0]) return;
+    const objectUrl = URL.createObjectURL(e.target.files[0]);
+    document.getElementById('select-image').src = objectUrl;
+    document.getElementById('processing-image').src = objectUrl;
+    showScreen('select');
+    fileInput.value = '';
+  });
+
+  // Bounding box click → Processing → Results
+  function selectPart(index) {
+    showScreen('processing');
+    setTimeout(() => showScreen('results'), 2200);
+  }
+</script>
+
+</body>
+</html>
